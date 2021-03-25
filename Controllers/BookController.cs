@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using TestApplication.Data;
-using TestApplication.DTO;
+using DorsetBookApi.Data;
+using DorsetBookApi.DTO;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using TestApplication.Models;
-using DTO;
+using DorsetBookApi.Models;
 
-namespace TestApplication.Controllers
+namespace DorsetBookApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
