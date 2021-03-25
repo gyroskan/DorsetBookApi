@@ -1,9 +1,8 @@
-using Models;
-
 namespace DorsetBookApi.DTO
 {
-    public class BookDTO : Library
+    public class BookDTO
     {
+        public int Book_id { get; set; }
         public decimal Book_price { get; set; }
         public string ISBN { get; set; }
         public string Book_name { get; set; }
