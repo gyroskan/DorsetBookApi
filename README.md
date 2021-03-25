@@ -1,4 +1,4 @@
 C# BookApi deployement.
 
-Gyroskan = Baptiste Nehmé
-AldeppChev = Alexandre Netchaev
+Gyroskan = Baptiste Nehmé <br />
+AldeppChev = Alexandre Netchaev <br />
