@@ -4,14 +4,14 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using AutoMapper;
-using DTO;
-using Helpers;
+using DorsetBookApi.DTO;
+using DorsetBookApi.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using Models;
-using Services;
+using DorsetBookApi.Models;
+using DorsetBookApi.Services;
 
 namespace Controllers
 {
@@ -62,8 +62,8 @@ namespace Controllers
             {
                 Id = user.Id,
                 Username = user.Username,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
+                FirstName = user.Firstname,
+                LastName = user.Lastname,
                 Token = tokenString
             });
         }

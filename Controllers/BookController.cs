@@ -6,9 +6,11 @@ using DorsetBookApi.DTO;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using DorsetBookApi.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DorsetBookApi.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class BooksController : ControllerBase

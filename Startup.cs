@@ -1,17 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using DorsetBookApi.Data;
+using DorsetBookApi.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 namespace DorsetBookApi
@@ -34,9 +36,74 @@ namespace DorsetBookApi
             {
                 opt.UseMySql(Configuration.GetConnectionString("DefaultConnection"));
             });
+            services.AddCors();
+            services.AddControllers();
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            
+            var key = Encoding.ASCII.GetBytes(Configuration["Secret"]);
+            services.AddAuthentication(x =>
+                {
+                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(x =>
+                {
+                    x.Events = new JwtBearerEvents
+                    {
+                        OnTokenValidated = context =>
+                        {
+                            var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
+                            var userId = int.Parse(context.Principal.Identity.Name);
+                            var user = userService.GetById(userId);
+                            if (user == null)
+                            {
+                                // return unauthorized if user no longer exists
+                                context.Fail("Unauthorized");
+                            }
+                            return Task.CompletedTask;
+                        }
+                    };
+                    x.RequireHttpsMetadata = false;
+                    x.SaveToken = true;
+                    x.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ValidateIssuer = false,
+                        ValidateAudience = false
+                    };
+                });
+
+            // configure DI for application services
+            services.AddScoped<IUserService, UserServices>();
+            
+            
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "DorsetBookApi", Version = "v1" });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()  
+                {  
+                    Name = "Authorization",  
+                    Type = SecuritySchemeType.ApiKey,  
+                    Scheme = "Bearer",  
+                    BearerFormat = "JWT",  
+                    In = ParameterLocation.Header,  
+                    Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 12345abcdef\"",  
+                });  
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement  
+                {  
+                    {  
+                        new OpenApiSecurityScheme  
+                        {
+                            Reference = new OpenApiReference  
+                            {  
+                                Type = ReferenceType.SecurityScheme,  
+                                Id = "Bearer"  
+                            }  
+                        },  
+                        new string[] {}  
+                    }  
+                });
             });
         }
 
@@ -49,6 +116,11 @@ namespace DorsetBookApi
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "DorsetBookApi v1"));
             }
+            
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
 
             app.UseHttpsRedirection();
 

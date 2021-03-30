@@ -1,6 +1,6 @@
 using AutoMapper;
-using DTO;
-using Models;
+using DorsetBookApi.DTO;
+using DorsetBookApi.Models;
 
 namespace Helpers
 {

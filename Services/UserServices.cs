@@ -8,7 +8,7 @@ using DorsetBookApi.Helpers;
 using DorsetBookApi.Data;
 using System.Threading.Tasks;
 
-namespace DorsetBookApi
+namespace DorsetBookApi.Services
 {
     public interface IUserService
     {
@@ -69,13 +69,13 @@ namespace DorsetBookApi
                 throw new AppException("Password is required");
             }
 
-            if (_context.User.Any(x => x.username == user.username))
+            if (_context.User.Any(x => x.Username == user.Username))
             {
-                throw new AppException("Username \"" + user.username + "\" is already taken");
+                throw new AppException("Username \"" + user.Username + "\" is already taken");
             }
 
             //Saving hashed password into Database table
-            user.passwordhash = computeHash(password);
+            user.PasswordHash = computeHash(password);
 
             _context.User.Add(user);
             _context.SaveChanges();
@@ -86,36 +86,36 @@ namespace DorsetBookApi
         public void Update(User userParam, string currentPassword = null, string password = null, string confirmPassword = null)
         {
             //Find the user by Id
-            var user = _context.User.Find(userParam.id);
+            var user = _context.User.Find(userParam.Id);
 
             if (user == null)
             {
                 throw new AppException("User not found");
             }
             // update user properties if provided
-            if (!string.IsNullOrWhiteSpace(userParam.username) && userParam.username != user.username)
+            if (!string.IsNullOrWhiteSpace(userParam.Username) && userParam.Username != user.Username)
             {
                 // throw error if the new username is already taken
-                if (_context.User.Any(x => x.username == userParam.username))
+                if (_context.User.Any(x => x.Username == userParam.Username))
                 {
-                    throw new AppException("Username " + userParam.username + " is already taken");
+                    throw new AppException("Username " + userParam.Username + " is already taken");
                 }
                 else
                 {
-                    user.username = userParam.username;
+                    user.Username = userParam.Username;
                 }
             }
-            if (!string.IsNullOrWhiteSpace(userParam.firstname))
+            if (!string.IsNullOrWhiteSpace(userParam.Firstname))
             {
-                user.firstname = userParam.firstname;
+                user.Firstname = userParam.Firstname;
             }
-            if (!string.IsNullOrWhiteSpace(userParam.lastname))
+            if (!string.IsNullOrWhiteSpace(userParam.Lastname))
             {
-                user.lastname = userParam.lastname;
+                user.Lastname = userParam.Lastname;
             }
             if (!string.IsNullOrWhiteSpace(currentPassword))
             {
-                if (computeHash(currentPassword) != user.passwordhash)
+                if (computeHash(currentPassword) != user.PasswordHash)
                 {
                     throw new AppException("Invalid Current password!");
                 }
@@ -131,7 +131,7 @@ namespace DorsetBookApi
                 }
 
                 //Updating hashed password into Database table
-                user.passwordhash = computeHash(password);
+                user.PasswordHash = computeHash(password);
             }
 
             _context.User.Update(user);
