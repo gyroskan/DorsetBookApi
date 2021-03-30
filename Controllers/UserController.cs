@@ -13,7 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using DorsetBookApi.Models;
 using DorsetBookApi.Services;
 
-namespace Controllers
+namespace DorsetBookApi.Controllers
 {
     [Authorize]
     [ApiController]
